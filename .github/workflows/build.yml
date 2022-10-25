@@ -61,15 +61,15 @@ jobs:
         file: dev/build/Dockerfile
         push: true
         tags: |
-          requarks/wiki:canary
-          requarks/wiki:canary-${{ env.REL_VERSION_STRICT }}
-          ghcr.io/requarks/wiki:canary
-          ghcr.io/requarks/wiki:canary-${{ env.REL_VERSION_STRICT }}
+          zabavin90/wiki:canary
+          zabavin90/wiki:canary-${{ env.REL_VERSION_STRICT }}
+          ghcr.io/zabavindy/wiki:canary
+          ghcr.io/zabavindy/wiki:canary-${{ env.REL_VERSION_STRICT }}
 
     - name: Extract compiled files
       run: |
         mkdir -p _dist
-        docker create --name wiki ghcr.io/requarks/wiki:canary-$REL_VERSION_STRICT
+        docker create --name wiki ghcr.io/zabavindy/wiki:canary-$REL_VERSION_STRICT
         docker cp wiki:/wiki _dist
         docker rm wiki
         rm _dist/wiki/config.yml
@@ -179,8 +179,8 @@ jobs:
         platforms: ${{ matrix.platform }}
         push: true
         tags: |
-          requarks/wiki:canary-${{ matrix.docker }}-${{ env.REL_VERSION_STRICT }}
-          ghcr.io/requarks/wiki:canary-${{ matrix.docker }}-${{ env.REL_VERSION_STRICT }}
+          zabavin90/wiki:canary-${{ matrix.docker }}-${{ env.REL_VERSION_STRICT }}
+          ghcr.io/zabavindy/wiki:canary-${{ matrix.docker }}-${{ env.REL_VERSION_STRICT }}
 
   windows:
     name: Windows Build
@@ -248,13 +248,13 @@ jobs:
       run: |
         echo "Creating the manifests..."
 
-        docker manifest create requarks/wiki:beta-$REL_VERSION_STRICT requarks/wiki:canary-$REL_VERSION_STRICT requarks/wiki:canary-arm64-$REL_VERSION_STRICT requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create ghcr.io/requarks/wiki:beta-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create zabavin90/wiki:beta-$REL_VERSION_STRICT zabavin90/wiki:canary-$REL_VERSION_STRICT zabavin90/wiki:canary-arm64-$REL_VERSION_STRICT zabavin90/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create ghcr.io/zabavindy/wiki:beta-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-armv7-$REL_VERSION_STRICT
 
         echo "Pushing the manifests..."
 
-        docker manifest push -p requarks/wiki:beta-$REL_VERSION_STRICT
-        docker manifest push -p ghcr.io/requarks/wiki:beta-$REL_VERSION_STRICT
+        docker manifest push -p zabavin90/wiki:beta-$REL_VERSION_STRICT
+        docker manifest push -p ghcr.io/zabavindy/wiki:beta-$REL_VERSION_STRICT
 
   release:
     name: Publish Release Images
@@ -298,25 +298,25 @@ jobs:
         echo "Using major $MAJOR and minor $MINOR..."
         echo "Creating the manifests..."
 
-        docker manifest create requarks/wiki:$REL_VERSION_STRICT requarks/wiki:canary-$REL_VERSION_STRICT requarks/wiki:canary-arm64-$REL_VERSION_STRICT requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create requarks/wiki:$MAJOR requarks/wiki:canary-$REL_VERSION_STRICT requarks/wiki:canary-arm64-$REL_VERSION_STRICT requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create requarks/wiki:$MAJORMINOR requarks/wiki:canary-$REL_VERSION_STRICT requarks/wiki:canary-arm64-$REL_VERSION_STRICT requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create requarks/wiki:latest requarks/wiki:canary-$REL_VERSION_STRICT requarks/wiki:canary-arm64-$REL_VERSION_STRICT requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create ghcr.io/requarks/wiki:$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create ghcr.io/requarks/wiki:$MAJOR ghcr.io/requarks/wiki:canary-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create ghcr.io/requarks/wiki:$MAJORMINOR ghcr.io/requarks/wiki:canary-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-armv7-$REL_VERSION_STRICT
-        docker manifest create ghcr.io/requarks/wiki:latest ghcr.io/requarks/wiki:canary-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/requarks/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create zabavin90/wiki:$REL_VERSION_STRICT zabavin90/wiki:canary-$REL_VERSION_STRICT zabavin90/wiki:canary-arm64-$REL_VERSION_STRICT zabavin90/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create zabavin90/wiki:$MAJOR zabavin90/wiki:canary-$REL_VERSION_STRICT zabavin90/wiki:canary-arm64-$REL_VERSION_STRICT zabavin90/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create zabavin90/wiki:$MAJORMINOR zabavin90/wiki:canary-$REL_VERSION_STRICT zabavin90/wiki:canary-arm64-$REL_VERSION_STRICT zabavin90/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create zabavin90/wiki:latest zabavin90/wiki:canary-$REL_VERSION_STRICT zabavin90/wiki:canary-arm64-$REL_VERSION_STRICT zabavin90/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create ghcr.io/zabavindy/wiki:$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create ghcr.io/zabavindy/wiki:$MAJOR ghcr.io/zabavindy/wiki:canary-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create ghcr.io/zabavindy/wiki:$MAJORMINOR ghcr.io/zabavindy/wiki:canary-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-armv7-$REL_VERSION_STRICT
+        docker manifest create ghcr.io/zabavindy/wiki:latest ghcr.io/zabavindy/wiki:canary-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-arm64-$REL_VERSION_STRICT ghcr.io/zabavindy/wiki:canary-armv7-$REL_VERSION_STRICT
 
         echo "Pushing the manifests..."
 
-        docker manifest push -p requarks/wiki:$REL_VERSION_STRICT
-        docker manifest push -p requarks/wiki:$MAJOR
-        docker manifest push -p requarks/wiki:$MAJORMINOR
-        docker manifest push -p requarks/wiki:latest
-        docker manifest push -p ghcr.io/requarks/wiki:$REL_VERSION_STRICT
-        docker manifest push -p ghcr.io/requarks/wiki:$MAJOR
-        docker manifest push -p ghcr.io/requarks/wiki:$MAJORMINOR
-        docker manifest push -p ghcr.io/requarks/wiki:latest
+        docker manifest push -p zabavin90/wiki:$REL_VERSION_STRICT
+        docker manifest push -p zabavin90/wiki:$MAJOR
+        docker manifest push -p zabavin90/wiki:$MAJORMINOR
+        docker manifest push -p zabavin90/wiki:latest
+        docker manifest push -p ghcr.io/zabavindy/wiki:$REL_VERSION_STRICT
+        docker manifest push -p ghcr.io/zabavindy/wiki:$MAJOR
+        docker manifest push -p ghcr.io/zabavindy/wiki:$MAJORMINOR
+        docker manifest push -p ghcr.io/zabavindy/wiki:latest
 
     - name: Download Linux Build
       uses: actions/download-artifact@v2.1.0
@@ -347,34 +347,6 @@ jobs:
         body: ${{ steps.changelog.outputs.changes }}
         token: ${{ github.token }}
         artifacts: 'drop/wiki-js.tar.gz,drop-win/wiki-js-windows.tar.gz'
-        
-    - name: Notify Slack Releases Channel
-      uses: slackapi/slack-github-action@v1.18.0
-      with:
-        payload: |
-          {
-            "text": "Wiki.js ${{ github.ref_name }} has been released."
-          }
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-        
-    - name: Notify Telegram Channel
-      uses: appleboy/telegram-action@v0.1.1
-      with:
-        to: ${{ secrets.TELEGRAM_TO }}
-        token: ${{ secrets.TELEGRAM_TOKEN }}
-        format: markdown
-        disable_web_page_preview: true
-        message: |
-          Wiki.js *${{ github.ref_name }}* has been released!
-          See [release notes](https://github.com/requarks/wiki/releases) for details.
-          
-    - name: Notify Discord Channel
-      uses: sebastianpopp/discord-action@v1.0
-      with:
-        webhook: ${{ secrets.DISCORD_WEBHOOK }}
-        message: Wiki.js ${{ github.ref_name }} has been released! See https://github.com/requarks/wiki/releases for details.
 
   build-do-image:
     name: Build DigitalOcean Image
