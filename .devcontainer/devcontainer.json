@@ -1,6 +1,6 @@
 // Как заставить удаленную разработку контейнеров работать с VSCode:
 // 1. Установите пакет расширения  "Remote Development" (ms-vscode-remote.vscode-remote-extensionpack)
-// 2. Выбирать "Remote Containers - Reopen in container"
+// 2. Выбирать "Remote Containers - Reopen in container".
 
 {
   "name": "Wiki.js",
