@@ -5,10 +5,10 @@
         v-text-field.editor-title-input(
           dark
           solo
+          background-color='blue darken-3'
           flat
           v-model='currentPageTitle'
           hide-details
-          background-color='black'
           dense
           full-width
         )

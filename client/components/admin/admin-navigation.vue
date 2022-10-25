@@ -23,6 +23,15 @@
                   v-toolbar-title.subtitle-1 {{$t('admin:navigation.mode')}}
                 v-list(nav, two-line)
                   v-list-item-group(v-model='config.mode', mandatory, :color='$vuetify.theme.dark ? `teal lighten-3` : `teal`')
+                    v-list-item(value='CLBSNAV')
+                      v-list-item-avatar
+                        img(src='/_assets/svg/icon-tree-structure-dotted.svg', alt='Site Tree')
+                      v-list-item-content
+                        v-list-item-title Навигация CLBS
+                        v-list-item-subtitle Навигация CLBS
+                      v-list-item-avatar
+                        v-icon(v-if='$vuetify.theme.dark', :color='config.mode === `CLBSNAV` ? `teal lighten-3` : `grey darken-2`') mdi-check-circle
+                        v-icon(v-else, :color='config.mode === `CLBSNAV` ? `teal` : `grey lighten-3`') mdi-check-circle
                     v-list-item(value='TREE')
                       v-list-item-avatar
                         img(src='/_assets/svg/icon-tree-structure-dotted.svg', alt='Site Tree')

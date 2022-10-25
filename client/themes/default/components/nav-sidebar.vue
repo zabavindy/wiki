@@ -23,10 +23,28 @@
         depressed
         :color='$vuetify.theme.dark ? `grey darken-4` : `blue darken-2`'
         style='flex: 1 1 100%;'
+        @click='switchMode(`clbs`)'
+        )
+        v-icon(left) mdi-file-tree
+        .body-2.text-none {{$t('common:sidebar.tree')}}
+      v-btn.ml-3(
+        v-else-if='currentMode === `clbs`'
+        depressed
+        :color='$vuetify.theme.dark ? `grey darken-4` : `blue darken-2`'
+        style='flex: 1 1 100%;'
         @click='switchMode(`custom`)'
         )
         v-icon(left) mdi-navigation
         .body-2.text-none {{$t('common:sidebar.mainMenu')}}
+    .pa-3.d-flex(v-if='navMode === `clbs`', :class='$vuetify.theme.dark ? `grey darken-5` : `blue darken-3`')
+      v-btn(
+        depressed
+        :color='$vuetify.theme.dark ? `grey darken-4` : `blue darken-2`'
+        style='min-width:0;'
+        @click='goHome'
+        :aria-label='$t(`common:header.home`)'
+        )
+        v-icon(size='20') mdi-home
     v-divider
     //-> Custom Navigation
     v-list.py-2(v-if='currentMode === `custom`', dense, :class='color', :dark='dark')
@@ -43,6 +61,27 @@
           v-list-item-title {{ item.l }}
         v-divider.my-2(v-else-if='item.k === `divider`')
         v-subheader.pl-4(v-else-if='item.k === `header`') {{ item.l }}
+    //-> CLBS Navigation
+    v-list.py-2(v-else-if='currentMode === `clbs`', dense, :class='color', :dark='dark')
+      v-treeview(
+        activatable
+        dense
+        hoverable
+        :color='"white"'
+        :active='treeDefaultActive'
+        :open='treeDefaultOpen'
+        :items='treeItems'
+        :load-children='fetchTreeChild'
+        @update:active='activeTreeItem'
+        )
+          template(v-slot:label="{ item }")
+            div(class='tree-item')
+              a(v-if="!item.children" :href="'/'+item.locale+'/'+item.path")
+                span {{item.name}}
+              a(v-else :href="'/'+item.locale+'/'+item.path")
+                span {{item.name}}
+              //-span(v-else)
+              //-  b {{item.name}}
     //-> Browse
     v-list.py-2(v-else-if='currentMode === `browse`', dense, :class='color', :dark='dark')
       template(v-if='currentParent.id > 0')
@@ -102,7 +141,10 @@ export default {
         title: '/ (root)'
       },
       parents: [],
-      loadedCache: []
+      loadedCache: [],
+      treeItems: [],
+      treeDefaultOpen: [],
+      treeDefaultActive: []
     }
   },
   computed: {
@@ -115,6 +157,9 @@ export default {
       window.localStorage.setItem('navPref', mode)
       if (mode === `browse` && this.loadedCache.length < 1) {
         this.loadFromCurrentPath()
+      }
+      if (mode === 'clbs') {
+        this.fetchTreeRoot()
       }
     },
     async fetchBrowseItems (item) {
@@ -219,6 +264,94 @@ export default {
     },
     goHome () {
       window.location.assign(siteLangs.length > 0 ? `/${this.locale}/home` : '/')
+    },
+    pageItem2TreeItem(item, level) {
+      if (item.isFolder) {
+        return { id: item.id, level: level, pageId: item.pageId, path: item.path, locale: item.locale, name: item.title, children: [] }
+      } else {
+        return { id: item.id, level: level, path: item.path, locale: item.locale, name: item.title }
+      }
+    },
+    activeTreeItem(id) {
+      const find = (items) => {
+        for (const item of items) {
+          if (item.id === id) {
+            return item
+          }
+          if (item.children && item.children.length) {
+            const v = find(item.children)
+            if (v) {
+              return v
+            }
+          }
+        }
+      }
+      const item = find(this.treeItems)
+      if (item) {
+        if (!this.treeDefaultActive.includes(item.id)) {
+          location.href = `/${item.locale}/${item.path}`
+        } else {
+          setTimeout(() => {
+            const el = document.querySelector('.v-treeview-node--active')
+            el.scrollIntoViewIfNeeded()
+          })
+        }
+      }
+    },
+    async fetchTreeChild(parent) {
+      const items = await this.fetchPages(parent.id)
+      parent.children = []
+      // if (parent.pageId) {
+      //  parent.children.push({
+      //    id: parent.pageId, level: parent.level + 1, path: parent.path, locale: parent.locale, name: parent.name
+      //  })
+      // }
+      parent.children.push(
+        ...items.map(item => this.pageItem2TreeItem(item, parent.level + 1))
+      )
+      this.checkTreeDefaultOpen(parent.children)
+    },
+    async fetchTreeRoot() {
+      const children = await this.fetchPages(0)
+      this.treeItems = children.map(item => this.pageItem2TreeItem(item, 0))
+      this.checkTreeDefaultOpen(this.treeItems, 0)
+    },
+    async checkTreeDefaultOpen(items) {
+      const item = items.find(item => item.children && this.path.startsWith(item.path))
+      if (item) {
+        setTimeout(() => {
+          this.treeDefaultOpen.push(item.id)
+        })
+      }
+      const active = items.find(item => item.path === this.path)
+      if (active) {
+        this.treeDefaultActive.push(active.id)
+      }
+    },
+    async fetchPages(id) {
+      const resp = await this.$apollo.query({
+        query: gql`
+          query($parent: Int, $locale: String!) {
+            pages {
+              tree(parent: $parent, mode: ALL, locale: $locale) {
+                id
+                path
+                title
+                isFolder
+                pageId
+                parent
+                locale
+              }
+            }
+          }
+        `,
+        fetchPolicy: 'cache-first',
+        variables: {
+          parent: id,
+          locale: this.locale
+        }
+      })
+      return _.get(resp, 'data.pages.tree', [])
     }
   },
   mounted () {
@@ -227,12 +360,41 @@ export default {
       this.currentMode = 'browse'
     } else if (this.navMode === 'STATIC') {
       this.currentMode = 'custom'
+    } else if (this.navMode === 'CLBSNAV') {
+      this.currentMode = 'clbs'
     } else {
       this.currentMode = window.localStorage.getItem('navPref') || 'custom'
     }
     if (this.currentMode === 'browse') {
       this.loadFromCurrentPath()
     }
+    if (this.currentMode === 'clbs') {
+      this.fetchTreeRoot()
+    }
   }
 }
 </script>
+
+<style lang="scss">
+.v-treeview{
+  .tree-item {
+    font-weight: 500;
+    line-height: 1rem;
+    font-size: 0.8rem;
+  }
+  .v-treeview-node__level {
+    width: 12px;
+  }
+  .v-treeview-node__label{
+    font-size: 0.8rem;
+  }
+  a {
+    text-decoration: none;
+  }
+  &.theme--dark{
+    a {
+      color: white;
+    }
+  }
+}
+</style>
